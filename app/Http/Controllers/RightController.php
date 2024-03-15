@@ -4,54 +4,87 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
 use App\Http\Requests\ApiRequest;
-use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\RightAddRequest;
+use App\Models\File;
+use App\Models\Right;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class RightController extends Controller
 {
-  /** Авторизация */
-  public function login(LoginRequest $request): JsonResponse
+  public function add(RightAddRequest $request): JsonResponse
   {
-    $creds = request(['email', 'password']);
+    $response = $this->getRightsResponse($request->file_id);
 
-    if (!Auth::attempt($creds)) {
-      throw new ApiException(401, 'Authorization failed');
+    return response()->json($response);
+  }
+
+  public function destroy(ApiRequest $request, $file_id): JsonResponse
+  {
+    $file = File::findOrFail($file_id);
+
+    /** По хорошему это вынести в request или политику для прав */
+    if ($request->user()->id !== $file->user_id) {
+      throw new ApiException(403, 'Forbidden for you');
     }
 
-    $token = $request->user()->generateToken();
-    $data = $this->getAuthResponse($token);
+    $user = User::where('email', $request->email)->first();
 
-    return response()->json($data);
+    if (!$user) {
+      return response()->json(['message' => 'User not found'], 404);
+    }
+
+    $right = Right::where('file_id', $file->id)->where('user_id', $user->id)->first();
+
+    /** По хорошему это вынести в request или политику для прав */
+    if (!$right) {
+      throw new ApiException(403, 'Forbidden for you');
+    }
+
+    $right->delete();
+
+    $response = $this->getRightsResponse($file->id);
+
+    return response()->json($response);
   }
 
-  /** Формирует ответ согласно требованиям */
-  protected function getAuthResponse(string $token, int $code = 200): array
+  /**  Мелкая утилитка для формирования ответа с правами */
+  private function getRightsResponse($file_id): JsonResponse|array
   {
-    return [
-      'code' => $code,
-      'token' => $token,
-      'success' => true,
-      'message' => 'Success'
+    $file = File::where('file_id', $file_id)->first();
+
+    if (!$file) {
+      return response()->json(['message' => 'File not found'], 404);
+    }
+
+    /** По сути сначала надо проверить права, а уже потом вызывать функцию, ну да ладно */
+    if ($file->user_id !== Auth::id()) {
+      throw new ApiException(403, 'Forbidden for you');
+    }
+
+    $rights = Right::where('file_id', $file->id)->with('user')->get();
+    $response = [];
+
+    $author = $file->user;
+    $response[] = [
+      'fullname' => "$author->first_name $author->last_name",
+      'email' => $author->email,
+      'type' => 'author',
+      'code' => 200,
     ];
-  }
 
-  /** Регистрация */
-  public function register(RegisterRequest $request): JsonResponse
-  {
-    $token = User::create($request->all())->generateToken();
-    $data = $this->getAuthResponse($token);
+    /** TODO: вынести в коллекции */
+    foreach ($rights as $access) {
+      $user = $access->user;
+      $response[] = [
+        'fullname' => "$user->first_name $user->last_name",
+        'email' => $user->email,
+        'type' => 'co-author',
+        'code' => 200,
+      ];
+    }
 
-    return response()->json($data);
-  }
-
-  /** Регистрация */
-  public function logout(ApiRequest $request): JsonResponse
-  {
-    $request->user()->forceFill(['remember_token' => ''])->save();
-
-    return response()->json()->setStatusCode(204);
+    return $response;
   }
 }
