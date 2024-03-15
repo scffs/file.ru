@@ -20,7 +20,7 @@ class RightController extends Controller
     return response()->json($response);
   }
 
-  public function destroy(ApiRequest $request, $file_id): JsonResponse
+  public function destroy(ApiRequest $request, string $file_id): JsonResponse
   {
     $file = File::findOrFail($file_id);
 
@@ -50,7 +50,7 @@ class RightController extends Controller
   }
 
   /**  Мелкая утилитка для формирования ответа с правами */
-  private function getRightsResponse($file_id): JsonResponse|array
+  private function getRightsResponse(string $file_id): JsonResponse|array
   {
     $file = File::where('file_id', $file_id)->first();
 
