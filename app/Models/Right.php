@@ -15,11 +15,13 @@ class Right extends Model
     'user_id'
   ];
 
+  //
   public function file(): BelongsTo
   {
     return $this->belongsTo(File::class);
   }
 
+  //
   public function user(): BelongsTo
   {
     return $this->belongsTo(User::class);

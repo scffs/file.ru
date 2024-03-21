@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RightController extends Controller
 {
+  //
   public function add(RightAddRequest $request): JsonResponse
   {
     $response = $this->getRightsResponse($request->file_id);
@@ -20,6 +21,7 @@ class RightController extends Controller
     return response()->json($response);
   }
 
+  //
   public function destroy(ApiRequest $request, string $file_id): JsonResponse
   {
     $file = File::findOrFail($file_id);
@@ -49,6 +51,7 @@ class RightController extends Controller
     return response()->json($response);
   }
 
+  //
   /**  Мелкая утилитка для формирования ответа с правами */
   private function getRightsResponse(string $file_id): JsonResponse|array
   {

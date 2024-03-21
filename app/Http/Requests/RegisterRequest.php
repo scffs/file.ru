@@ -6,6 +6,7 @@ class RegisterRequest extends ApiRequest
 {
   public function rules(): array
   {
+    //
     return [
       'email' => 'required|email|unique:users,email',
       'password' => 'required|string|min:3',

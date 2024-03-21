@@ -9,11 +9,13 @@ use Illuminate\Foundation\Http\FormRequest;
 class ApiRequest extends FormRequest
 {
 
+  //
   protected function failedValidation(Validator $validator)
   {
     throw new ApiException(422, '', $validator->errors());
   }
 
+  //
   protected function failedAuthorization()
   {
     throw new ApiException(403, 'Login failed',);

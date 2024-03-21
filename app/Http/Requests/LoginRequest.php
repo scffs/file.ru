@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 class LoginRequest extends ApiRequest
 {
 
+  //
   /** Валидируем входящие данные */
   public function rules(): array
   {

@@ -12,7 +12,7 @@ return new class extends Migration {
   {
     Schema::create('rights', function (Blueprint $table) {
       $table->id();
-
+      //
       $table->foreignId('file_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
       $table->foreignId('user_id')->constrained()->onUpdate('cascade')->onDelete('cascade');
 

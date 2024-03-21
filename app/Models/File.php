@@ -19,16 +19,19 @@ class File extends Model
     'user_id',
   ];
 
+  //
   public function user(): BelongsTo
   {
     return $this->belongsTo(User::class);
   }
 
+  //
   public function file(): BelongsTo
   {
     return $this->belongsTo(File::class, 'file_id');
   }
 
+  //
   public function rights(): HasMany
   {
     return $this->hasMany(Right::class);

@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FileController extends Controller
 {
+  //
   public function upload(ApiRequest $request): JsonResponse
   {
     $pathToUpload = 'uploads/' . $request->user()->id . '/';
@@ -109,6 +110,7 @@ class FileController extends Controller
     return $fileName;
   }
 
+  //
   public function edit(EditRequest $request): JsonResponse
   {
     $newFileName = $request->name;
@@ -145,6 +147,7 @@ class FileController extends Controller
     return response()->json($data);
   }
 
+  //
   public function destroy(string $file_id): JsonResponse
   {
     $file = File::where('file_id', $file_id)->first();
@@ -169,6 +172,7 @@ class FileController extends Controller
     return response()->json($data);
   }
 
+  //
   public function download(string $file_id): BinaryFileResponse|string
   {
     $file = File::where('file_id', $file_id)->first();
@@ -182,7 +186,7 @@ class FileController extends Controller
       ->where('file_id', $file->id)
       ->first();
 
-    if ($file->user_id !== Auth::id() || $coAuthor) {
+    if ($file->user_id !== Auth::id() || !$coAuthor) {
       throw new ApiException(403, 'Forbidden for you');
     }
 
@@ -190,6 +194,7 @@ class FileController extends Controller
     return response()->download($path, basename($path));
   }
 
+  //
   public function owned(ApiRequest $request): JsonResponse
   {
     $userId = $request->user()->id;
@@ -245,14 +250,16 @@ class FileController extends Controller
     /** TODO: вынести в коллекцию */
     $response = [];
     foreach ($filesWithAccess as $file) {
-      if ($file->user_id != $userId) {
-        $response[] = [
-          'file_id' => $file->file_id,
-          'code' => 200,
-          'name' => $file->name,
-          'url' => url("files/$file->file_id")
-        ];
+      if ($file->user_id == $userId) {
+        continue;
       }
+
+      $response[] = [
+        'file_id' => $file->file_id,
+        'code' => 200,
+        'name' => $file->name,
+        'url' => url("files/$file->file_id")
+      ];
     }
 
     return response()->json($response);

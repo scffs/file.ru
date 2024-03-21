@@ -53,6 +53,7 @@ class User extends Authenticatable
     'password' => 'hashed',
   ];
 
+  //
   public function generateToken(): string
   {
     $token = Hash::make(Str::random());

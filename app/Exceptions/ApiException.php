@@ -7,6 +7,7 @@ use Illuminate\Support\MessageBag;
 
 class ApiException extends HttpResponseException
 {
+  //
   public function __construct(int $code, string $message, MessageBag|array $errors = [])
   {
     $data = [

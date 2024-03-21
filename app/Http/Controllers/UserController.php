@@ -15,12 +15,15 @@ class UserController extends Controller
   /** Авторизация */
   public function login(LoginRequest $request): JsonResponse
   {
+    /** креды от аккаунта */
     $creds = request(['email', 'password']);
 
+    /** чек на валидность */
     if (!Auth::attempt($creds)) {
       throw new ApiException(401, 'Authorization failed');
     }
 
+    /** генерация токена + формирования ответа */
     $token = $request->user()->generateToken();
     $data = $this->getAuthResponse($token);
 
@@ -41,6 +44,7 @@ class UserController extends Controller
   /** Регистрация */
   public function register(RegisterRequest $request): JsonResponse
   {
+    /** созадние юзера + генерация токена + формирования ответа */
     $token = User::create($request->all())->generateToken();
     $data = $this->getAuthResponse($token);
 
@@ -50,6 +54,7 @@ class UserController extends Controller
   /** Выход из аккаунта */
   public function logout(ApiRequest $request): JsonResponse
   {
+    /** удаление токена из бд */
     $request->user()->forceFill(['remember_token' => ''])->save();
 
     return response()->json()->setStatusCode(204);

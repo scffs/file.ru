@@ -40,9 +40,11 @@ return [
       'driver' => 'session',
       'provider' => 'users',
     ],
+    // гварда для апишки
     'api' => [
       'driver' => 'token',
       'provider' => 'users',
+      // меняем дефолтное поле
       'storage_key' => 'remember_token'
     ],
   ],

@@ -6,6 +6,7 @@ namespace App\Http\Requests;
 
 class EditRequest extends ApiRequest
 {
+  //
   /** Валидируем входящие данные */
   public function rules(): array
   {
