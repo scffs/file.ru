@@ -214,7 +214,7 @@ class FileController extends Controller
 
       foreach ($file->rights as $right) {
         $accesses[] = [
-          'fullname' => $right->user->full_name,
+          'fullname' => $right->user->name . ' ' . $right->user->lastName,
           'email' => $right->user->email,
           'type' => 'co-author',
         ];
