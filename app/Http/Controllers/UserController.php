@@ -45,8 +45,6 @@ class UserController extends Controller
   /** Регистрация */
   public function register(RegisterRequest $request): JsonResponse
   {
-    throw new ForbiddenException();
-
     /** созадние юзера + генерация токена + формирования ответа */
     $token = User::create($request->all())->generateToken();
     $data = $this->getAuthResponse($token);
