@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ApiException;
+use App\Exceptions\ForbiddenException;
 use App\Http\Requests\ApiRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
@@ -44,6 +45,8 @@ class UserController extends Controller
   /** Регистрация */
   public function register(RegisterRequest $request): JsonResponse
   {
+    throw new ForbiddenException();
+
     /** созадние юзера + генерация токена + формирования ответа */
     $token = User::create($request->all())->generateToken();
     $data = $this->getAuthResponse($token);

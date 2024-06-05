@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\ApiException;
+use App\Exceptions\ForbiddenException;
+use App\Exceptions\NotFoundException;
 use App\Http\Requests\ApiRequest;
 use App\Http\Requests\EditRequest;
 use App\Models\File;
@@ -120,12 +121,12 @@ class FileController extends Controller
 
     /** Нет файла в БД или на сервере */
     if (!$file || !Storage::exists($file->path)) {
-      throw new ApiException(404, 'Not Found');
+      throw new NotFoundException();
     }
 
     /** Нет прав на редактирование */
     if ($file->user_id != $request->user()->id) {
-      throw new ApiException(403, 'Forbidden for you');
+      throw new ForbiddenException();
     }
 
     $basePath = $file->path;
@@ -152,11 +153,11 @@ class FileController extends Controller
   {
     $file = File::where('file_id', $file_id)->first();
     if (!$file || !Storage::exists($file->path)) {
-      throw new ApiException(404, 'Not Found');
+      throw new NotFoundException();
     }
 
     if ($file->user_id !== Auth::id()) {
-      throw new ApiException(403, 'Forbidden for you');
+      throw new ForbiddenException();
     }
 
     $file->delete();
@@ -178,7 +179,7 @@ class FileController extends Controller
     $file = File::where('file_id', $file_id)->first();
 
     if (!$file) {
-      throw new ApiException(404, 'Not Found');
+      throw new NotFoundException();
     }
 
     $coAuthor = Right
@@ -187,7 +188,8 @@ class FileController extends Controller
       ->first();
 
     if ($file->user_id !== Auth::id() || !$coAuthor) {
-      throw new ApiException(403, 'Forbidden for you');
+      throw new ForbiddenException();
+
     }
 
     $path = Storage::disk("local")->path($file->path . "$file->name.$file->extension");
@@ -203,7 +205,7 @@ class FileController extends Controller
     $files = File::where('user_id', $userId)->with('rights.user')->get();
 
     if (!$files) {
-      throw new ApiException(404, 'Not Found');
+      throw new NotFoundException();
     }
 
     // Формируем ответ
@@ -243,7 +245,7 @@ class FileController extends Controller
       ->pluck('file');
 
     if (!$filesWithAccess) {
-      throw new ApiException(404, 'Not Found');
+      throw new NotFoundException();
     }
 
     /** Формируем ответ, исключая файлы, загруженные самим пользователем */

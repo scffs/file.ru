@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 //
 
 Route::post('/authorization', [UserController::class, 'login']);
-Route::post('/register', [UserController::class, 'register']);
+Route::post('/registration', [UserController::class, 'register']);
 
 
 Route::middleware('auth:api')->group(function () {

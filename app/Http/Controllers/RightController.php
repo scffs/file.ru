@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\ApiException;
+use App\Exceptions\ForbiddenException;
+use App\Exceptions\NotFoundException;
 use App\Http\Requests\ApiRequest;
 use App\Http\Requests\RightAddRequest;
 use App\Models\File;
@@ -28,20 +29,20 @@ class RightController extends Controller
 
     /** По хорошему это вынести в request или политику для прав */
     if ($request->user()->id !== $file->user_id) {
-      throw new ApiException(403, 'Forbidden for you');
+      throw new ForbiddenException();
     }
 
     $user = User::where('email', $request->email)->first();
 
     if (!$user) {
-      return response()->json(['message' => 'User not found'], 404);
+      throw new NotFoundException();
     }
 
     $right = Right::where('file_id', $file->id)->where('user_id', $user->id)->first();
 
     /** По хорошему это вынести в request или политику для прав */
     if (!$right) {
-      throw new ApiException(403, 'Forbidden for you');
+      throw new ForbiddenException();
     }
 
     $right->delete();
@@ -58,12 +59,12 @@ class RightController extends Controller
     $file = File::where('file_id', $file_id)->first();
 
     if (!$file) {
-      return response()->json(['message' => 'File not found'], 404);
+      throw new NotFoundException();
     }
 
     /** По сути сначала надо проверить права, а уже потом вызывать функцию, ну да ладно */
     if ($file->user_id !== Auth::id()) {
-      throw new ApiException(403, 'Forbidden for you');
+      throw new ForbiddenException();
     }
 
     $rights = Right::where('file_id', $file->id)->with('user')->get();
