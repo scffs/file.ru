@@ -2,27 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\ApiException;
 use App\Http\Requests\ApiRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
   /** Авторизация */
   public function login(LoginRequest $request): JsonResponse
   {
-    /** креды от аккаунта */
-    $creds = request(['email', 'password']);
-
-    /** чек на валидность */
-    if (!Auth::attempt($creds)) {
-      throw new ApiException(401, 'Authorization failed');
-    }
-
     /** генерация токена + формирования ответа */
     $token = $request->user()->generateToken();
     $data = $this->getAuthResponse($token);
