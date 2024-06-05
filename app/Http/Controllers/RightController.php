@@ -80,7 +80,7 @@ class RightController extends Controller
       throw new NotFoundException();
     }
 
-    $right = Right::where('file_id', $file->id)->where('user_id', $user->id)->first();
+    $right = Right::where(['file_id' => $file->id, 'user_id' => $user->id])->first();
 
     /** По хорошему это вынести в request или политику для прав */
     if (!$right) {

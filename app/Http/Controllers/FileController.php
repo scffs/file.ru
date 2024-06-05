@@ -183,8 +183,7 @@ class FileController extends Controller
     }
 
     $coAuthor = Right
-      ::where('user_id', Auth::id())
-      ->where('file_id', $file->id)
+      ::where(['user_id' => Auth::id(), 'file_id' => $file_id])
       ->first();
 
     if ($file->user_id !== Auth::id() || !$coAuthor) {
