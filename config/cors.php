@@ -19,6 +19,7 @@ return [
 
   'allowed_methods' => ['*'],
 
+  /** cors */
   'allowed_origins' => ['*'],
 
   'allowed_origins_patterns' => [],

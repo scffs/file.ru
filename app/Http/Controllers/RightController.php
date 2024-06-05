@@ -23,36 +23,7 @@ class RightController extends Controller
   }
 
   //
-  public function destroy(ApiRequest $request, string $file_id): JsonResponse
-  {
-    $file = File::findOrFail($file_id);
 
-    /** По хорошему это вынести в request или политику для прав */
-    if ($request->user()->id !== $file->user_id) {
-      throw new ForbiddenException();
-    }
-
-    $user = User::where('email', $request->email)->first();
-
-    if (!$user) {
-      throw new NotFoundException();
-    }
-
-    $right = Right::where('file_id', $file->id)->where('user_id', $user->id)->first();
-
-    /** По хорошему это вынести в request или политику для прав */
-    if (!$right) {
-      throw new ForbiddenException();
-    }
-
-    $right->delete();
-
-    $response = $this->getRightsResponse($file->id);
-
-    return response()->json($response);
-  }
-
-  //
   /**  Мелкая утилитка для формирования ответа с правами */
   private function getRightsResponse(string $file_id): JsonResponse|array
   {
@@ -90,5 +61,36 @@ class RightController extends Controller
     }
 
     return $response;
+  }
+
+  //
+
+  public function destroy(ApiRequest $request, string $file_id): JsonResponse
+  {
+    $file = File::findOrFail($file_id);
+
+    /** По хорошему это вынести в request или политику для прав */
+    if ($request->user()->id !== $file->user_id) {
+      throw new ForbiddenException();
+    }
+
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user) {
+      throw new NotFoundException();
+    }
+
+    $right = Right::where('file_id', $file->id)->where('user_id', $user->id)->first();
+
+    /** По хорошему это вынести в request или политику для прав */
+    if (!$right) {
+      throw new ForbiddenException();
+    }
+
+    $right->delete();
+
+    $response = $this->getRightsResponse($file->id);
+
+    return response()->json($response);
   }
 }

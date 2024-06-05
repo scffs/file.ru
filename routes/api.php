@@ -26,9 +26,10 @@ Route::middleware('auth:api')->group(function () {
   Route::get('/logout', [UserController::class, 'logout']);
 
   Route::prefix('files')->group(function () {
-    // Просмотр файлов пользователя
+    /** Просмотр файлов пользователя*/
     Route::get('/disk', [FileController::class, 'owned']);
-    // Просмотр файлов, к которым имеет доступ пользователь
+
+    /** Просмотр файлов, к которым имеет доступ пользователь */
     Route::get('/shared', [FileController::class, 'allowed']);
 
     Route::post('/upload', [FileController::class, 'upload']);
@@ -36,9 +37,10 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/{id}', [FileController::class, 'destroy']);
     Route::get('/{id}', [FileController::class, 'download']);
 
-    // Добавление прав доступа
+    /** Добавление прав доступа */
     Route::post('/{file_id}/accesses', [RightController::class, 'add']);
-    // Удаление прав доступа
+
+    /** Удаление прав доступа */
     Route::delete('/{file_id}/accesses', [RightController::class, 'destroy']);
   });
 });
