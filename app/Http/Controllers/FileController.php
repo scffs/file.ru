@@ -22,18 +22,18 @@ class FileController extends Controller
   //
   public function upload(ApiRequest $request): JsonResponse
   {
-    $pathToUpload = 'uploads/' . $request->user()->id . '/';
-
     /** Возвращаемый объект */
     $data = [];
     /** Базовый объект в случае успеха */
     $successData = [
       'success' => true,
       'code' => 200,
-      'message' => 'success',
+      'message' => 'Success',
     ];
 
     foreach ($request->file('files') as $file) {
+      $fileName = $file->getClientOriginalName();
+
       /** Валидация файла */
       $validator = Validator::make(['file' => $file], [
         'file' => 'max:2048|mimes:doc,pdf,docx,zip,jpeg,jpg,png',
@@ -43,11 +43,14 @@ class FileController extends Controller
         /** Сохранение плохого ответа API */
         $data[] = [
           'success' => false,
-          'message' => $validator->errors(),
-          'name' => $file->getClientOriginalName(),
+          'message' => "File not loaded",
+          'name' => $fileName,
         ];
         continue;
       }
+
+      $userId = $request->user()->id;
+      $pathToUpload = 'uploads/' . $userId . '/';
 
       /** Генерируем оригинальное имя файла */
       $fileName = $this->generateFileName($file, $pathToUpload);
@@ -62,12 +65,13 @@ class FileController extends Controller
           'extension' => $file->extension(),
           'path' => $pathToUpload,
           'file_id' => $fileId,
-          'user_id' => $request->user()->id,
+          'user_id' => $userId,
         ]);
 
         /** url = адрес сервера */
         $url = url("files/$fileId");
 
+        /** Массив с инфой о файле **/
         $fileData = [
           'name' => $fileName,
           'url' => $url,
@@ -81,7 +85,7 @@ class FileController extends Controller
         $data[] = [
           'success' => false,
           'message' => $e->getMessage(),
-          'name' => $file->getClientOriginalName(),
+          'name' => $fileName,
         ];
       }
     }
@@ -94,21 +98,23 @@ class FileController extends Controller
    */
   private function generateFileName(UploadedFile $file, string $pathToUpload): string
   {
-    /** Получаем расширение файла */
-    $extension = $file->getClientOriginalExtension();
     /** Получаем имя файла */
     $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+
+    /** Получаем расширение файла */
+    $extension = $file->getClientOriginalExtension();
+
     /** Формируем имя файла */
-    $fileName = $originalName . "." . $extension;
+    $fullFileName = $originalName . "." . $extension;
     $number = 1;
 
     /** Обновляем имя, пока элемент с таким именем существует */
-    while (Storage::exists($pathToUpload . $fileName)) {
-      $fileName = $originalName . " ($number)." . $extension;
+    while (Storage::exists($pathToUpload . $fullFileName)) {
+      $fullFileName = $originalName . " ($number)." . $extension;
       $number++;
     }
 
-    return $fileName;
+    return $fullFileName;
   }
 
   //
