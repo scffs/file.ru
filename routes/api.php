@@ -27,7 +27,7 @@ Route::middleware('auth:api')->group(function () {
 
   Route::prefix('files')->group(function () {
     /** Просмотр файлов пользователя*/
-    Route::get('/disk', [FileController::class, 'owned']);
+    Route::get('/disk', [FileController::class, 'disk']);
 
     /** Просмотр файлов, к которым имеет доступ пользователь */
     Route::get('/shared', [FileController::class, 'allowed']);

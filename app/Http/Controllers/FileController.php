@@ -202,11 +202,11 @@ class FileController extends Controller
   }
 
   //
-  public function owned(ApiRequest $request): JsonResponse
+  public function disk(ApiRequest $request): JsonResponse
   {
     $userId = $request->user()->id;
 
-    // Получаем файлы, загруженные текущим пользователем
+    // Получаем файлы, загруженные текущим пользователем с доп. инфой о правах
     $files = File::where('user_id', $userId)->with('rights.user')->get();
 
     if (!$files) {
@@ -253,14 +253,9 @@ class FileController extends Controller
       throw new NotFoundException();
     }
 
-    /** Формируем ответ, исключая файлы, загруженные самим пользователем */
     /** TODO: вынести в коллекцию */
     $response = [];
     foreach ($filesWithAccess as $file) {
-      if ($file->user_id == $userId) {
-        continue;
-      }
-
       $response[] = [
         'file_id' => $file->file_id,
         'code' => 200,

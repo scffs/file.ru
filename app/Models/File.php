@@ -26,12 +26,6 @@ class File extends Model
   }
 
   //
-  public function file(): BelongsTo
-  {
-    return $this->belongsTo(File::class, 'file_id');
-  }
-
-  //
   public function rights(): HasMany
   {
     return $this->hasMany(Right::class);
